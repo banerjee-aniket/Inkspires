@@ -1,6 +1,6 @@
 import AdminJS from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
-import { Database, Resource } from '@adminjs/prisma'; // Correct import
+import { Database, Resource } from '@adminjs/prisma';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 
@@ -10,18 +10,22 @@ const prisma = new PrismaClient();
 // Register AdminJS Prisma Adapter
 AdminJS.registerAdapter({ Database, Resource });
 
-// Initialize AdminJS with Prisma
+// Define Prisma models for AdminJS
 const admin = new AdminJS({
   resources: [
       {
-            resource: prisma, // Use Prisma as the database
-                  options: {},
+            resource: { model: prisma.user }, // Example: Replace 'user' with your actual model
+                  options: {}, 
                       },
-                        ],
-                          rootPath: '/admin', // Admin Panel Path
-                          });
+                          {
+                                resource: { model: prisma.post }, // Example: Replace 'post' with another model if needed
+                                      options: {},
+                                          }
+                                            ],
+                                              rootPath: '/admin', // Admin Panel Path
+                                              });
 
-                          // Create Express Router for AdminJS
-                          const adminRouter = AdminJSExpress.buildRouter(admin);
+                                              // Create Express Router for AdminJS
+                                              const adminRouter = AdminJSExpress.buildRouter(admin);
 
-                          export { admin, adminRouter };
+                                              export { admin, adminRouter };

@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { Request, Response, NextFunction } from "express";
 
 declare global {
   namespace Express {
@@ -120,27 +121,22 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+app.post("/api/login", (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) {
-        return next(err);
-      }
-      
-      if (!user) {
-        return res.status(401).json({ message: info?.message || "Login failed" });
-      }
-      
-      req.login(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        
-        // Remove password from response
-        const { password, ...userWithoutPassword } = user;
-        return res.status(200).json(userWithoutPassword);
-      });
-    })(req, res, next);
-  });
+            return res.status(500).json({ error: "Server error" });
+                }
+                    if (!user) {
+                          return res.status(401).json({ error: info.message });
+                              }
+                                  req.login(user, (err: any) => {
+                                        if (err) {
+                                                return res.status(500).json({ error: "Login failed" });
+                                                      }
+                                                            return res.json({ success: true, user });
+                                                                });
+                                                                  })(req, res, next);
+                                                                  });
 
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {
